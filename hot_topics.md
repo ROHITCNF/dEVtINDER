@@ -1,0 +1,7 @@
+- use of regex in routes
+- Querry params and dynamic routes
+- Multiple route handlers
+- next()
+- middilewares ?
+- How expressJs handles req and res BTS?
+- Difference between app.use() and app.all()
