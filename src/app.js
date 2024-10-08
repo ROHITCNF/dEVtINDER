@@ -1,25 +1,41 @@
 const express = require("express");
 const app = express();
-const { adminAuth } = require("../middlewares/auth");
-// logic of checking if the request is authorised or not
-// by a middileware function
+const { connectToDb } = require("./config/database");
+const User = require("./models/user");
 
-app.use("/admin", adminAuth);
-app.get("/admin", (req, res, next) => {
-  res.send("admin Rewuest handled");
-});
+app.post("/signup", async (req, res) => {
+  try {
+    const userObj = {
+      firstName: "Rohit",
+      lastName: "S",
+      emailId: "Rohitcnf@gmail.com",
+      password: "rohiT@12345",
+      age: 24,
+      gender: "M",
+    };
+    // Create a new instance of  userModel with above data
 
-app.get("/user", adminAuth, (req, res) => {
-  // res.send("User data sent");
-  throw new Error("jsbcjs");
-});
-
-//Error handling
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Something Went wrong");
+    const user = new User(userObj);
+    console.log("created new instance of User Model");
+    await user.save();
+    console.log("Saved the data in the DB");
+    res.send("Successfully saved the data in teh DB");
+  } catch (error) {
+    res.send(`Some error occured : ${error}`);
   }
 });
-app.listen(3000, () => {
-  console.log("Server Listening on 3000 port");
-});
+
+connectToDb()
+  .then(() => {
+    console.log("DB Connection Successful");
+    listenToServer();
+  })
+  .catch((err) => {
+    console.log("DB Connection errror", err);
+  });
+
+function listenToServer() {
+  app.listen(3000, () => {
+    console.log("Server Listening on 3000 port");
+  });
+}
