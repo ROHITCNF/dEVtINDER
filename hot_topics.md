@@ -5,3 +5,10 @@
 - middilewares ?
 - How expressJs handles req and res BTS?
 - Difference between app.use() and app.all()
+
+- ConnectTo DB
+- DB should be connected before the Listening of server
+- Mongoose library (for connection with the mongo db)
+- Create the schema with the mongoose
+- Create SignUp Post Api
+- Push some documents using API calls from Postman
