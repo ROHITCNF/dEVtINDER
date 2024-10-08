@@ -10,9 +10,16 @@ app.get("/admin", (req, res, next) => {
 });
 
 app.get("/user", adminAuth, (req, res) => {
-  res.send("User data sent");
+  // res.send("User data sent");
+  throw new Error("jsbcjs");
 });
 
+//Error handling
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something Went wrong");
+  }
+});
 app.listen(3000, () => {
   console.log("Server Listening on 3000 port");
 });
