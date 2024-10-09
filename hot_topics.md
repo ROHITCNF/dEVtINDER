@@ -12,3 +12,8 @@
 - Create the schema with the mongoose
 - Create SignUp Post Api
 - Push some documents using API calls from Postman
+
+- Differnce between JS object and JSON
+- Models.findOne({......}) in case of dupliccate doc which doc Mongo db return 
+- Explore the Models functions from the docs
+
