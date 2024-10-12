@@ -21,4 +21,8 @@
 - different validations we can write with the mongoose
 - Timestamps to use schema
 
+- Good practice to have Both API and Schema level validation
+- Create Login API
+- Compare passwords and throw erorr in case of invalidity
+
 
