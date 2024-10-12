@@ -80,11 +80,14 @@ app.patch("/user", async (req, res) => {
   try {
     const userId = req?.body.userId;
     const data = req?.body;
-    const updatedData = await User.findByIdAndUpdate({ _id: userId }, data);
+    const updatedData = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
     updatedData && res.send(`User data Updated Sucessfully : ${updatedData}`);
   } catch (error) {
     console.log(error);
-    res.send("Some error occured");
+    res.send(`Some error occured : ${error}`);
   }
 });
 

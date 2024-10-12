@@ -17,3 +17,8 @@
 - Models.findOne({......}) in case of dupliccate doc which doc Mongo db return 
 - Explore the Models functions from the docs
 
+- SchemaType options from the documentaion
+- different validations we can write with the mongoose
+- Timestamps to use schema
+
+
