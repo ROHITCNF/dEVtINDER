@@ -26,5 +26,6 @@
 - Compare passwords and throw erorr in case of invalidity
 
 - Testing Code Rabbit AI  PR reviews 
+- Testing Code Rabbit AI  PR reviews -2
 
 
