@@ -11,11 +11,11 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const port = 7777;
-2;
 //middileWare for express json
 app.use(express.json());
 app.use(cookieParser());
-app.use;
+
+// To Do : Offload User realated functions to USER_SCHEMA
 
 //signup Api
 app.post("/signup", async (req, res) => {
@@ -55,17 +55,9 @@ app.post("/login", async (req, res) => {
     if (!userObj) {
       throw new Error("Incorrect Credentials");
     }
-    const hashedPassword = userObj?.password;
-    const isCorrectPassword = await bcrypt.compare(password, hashedPassword);
-
-    console.log(`isCorrectPassword : ${isCorrectPassword}`);
+    const isCorrectPassword = await userObj.validateUserPassword(password);
     if (isCorrectPassword) {
-      // Create a JWT token
-      const token = await jwt.sign({ _id: userObj?._id }, "rohit@cnf12345", {
-        expiresIn: "0d",
-      });
-      // Add the token to cookie and send
-      console.log(token);
+      const token = await userObj.getJWT(); // More modular code
       res.cookie("token", token);
       res.send("Login Successfull");
     } else {
