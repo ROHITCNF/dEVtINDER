@@ -28,4 +28,10 @@
 - Testing Code Rabbit AI  PR reviews 
 - Testing Code Rabbit AI  PR reviews -2
 
+- Install cookie parser
+- Send Cookie to Login User
+- Craete a JWT token use it as a cookie 
+- Use this token to authenticate as a middileware
+
+
 
