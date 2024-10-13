@@ -10,7 +10,7 @@ const { adminAuth, authValidation } = require("./middlewares/auth");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-const port = 7777;
+const port = 3000;
 //middileWare for express json
 app.use(express.json());
 app.use(cookieParser());
