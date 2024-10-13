@@ -6,11 +6,16 @@ const {
   validateSignupData,
   validateLoginData,
 } = require("./utills/validations");
+const { adminAuth, authValidation } = require("./middlewares/auth");
 const bcrypt = require("bcrypt");
-
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const port = 7777;
+2;
 //middileWare for express json
 app.use(express.json());
+app.use(cookieParser());
+app.use;
 
 //signup Api
 app.post("/signup", async (req, res) => {
@@ -55,6 +60,13 @@ app.post("/login", async (req, res) => {
 
     console.log(`isCorrectPassword : ${isCorrectPassword}`);
     if (isCorrectPassword) {
+      // Create a JWT token
+      const token = await jwt.sign({ _id: userObj?._id }, "rohit@cnf12345", {
+        expiresIn: "0d",
+      });
+      // Add the token to cookie and send
+      console.log(token);
+      res.cookie("token", token);
       res.send("Login Successfull");
     } else {
       res.send("Incorrect Credentials");
@@ -66,8 +78,10 @@ app.post("/login", async (req, res) => {
 });
 
 //GET user by a particular api
-app.get("/user", async (req, res) => {
+app.get("/user", authValidation, async (req, res) => {
   try {
+    console.log("Going for the Authentication");
+    console.log("Auth Done");
     const email = req?.body?.emailId;
     const userObj = await User.findOne({ emailId: email });
     if (userObj) {
@@ -82,8 +96,10 @@ app.get("/user", async (req, res) => {
 });
 
 //Feed Api (GET APi)
-app.get("/feed", async (req, res) => {
+app.get("/feed", authValidation, async (req, res) => {
   try {
+    console.log("Going for the Authentication");
+    console.log("Auth Done");
     const userObj = await User.find({});
     if (userObj.length) {
       res.send(userObj);
@@ -92,7 +108,7 @@ app.get("/feed", async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.send("Some error occured");
+    res.send(`Some error occured : ${error}`);
   }
 });
 
@@ -104,8 +120,7 @@ app.delete("/user", async (req, res) => {
     user && res.send("User deleted Sucessfully");
     !user && res.send("Couldn't find the user");
   } catch (error) {
-    console.log(error);
-    res.send("Some error occured");
+    res.send("Some error occured" + error);
   }
 });
 
@@ -135,6 +150,11 @@ app.patch("/user/:userId", async (req, res) => {
     console.log(error);
     res.send(`Some error occured : ${error}`);
   }
+});
+
+// send connection  user
+app.post("/sendConnection", authValidation, async (req, res) => {
+  res.send("Request Sent Successfully");
 });
 
 connectToDb()
