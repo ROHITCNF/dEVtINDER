@@ -10,7 +10,7 @@ const { adminAuth, authValidation } = require("./middlewares/auth");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-const port = 3000;
+const port = 3001;
 //middileWare for express json
 app.use(express.json());
 app.use(cookieParser());
@@ -152,15 +152,15 @@ app.post("/sendConnection", authValidation, async (req, res) => {
   res.send("Request Sent Successfully");
 });
 
-connectToDb()
-  .then(() => {
-    console.log("DB Connection Successful");
-    listenToServer();
-  })
-  .catch((err) => {
-    console.log("DB Connection errror", err);
-  });
-
+// connectToDb()
+//   .then(() => {
+//     console.log("DB Connection Successful");
+//     listenToServer();
+//   })
+//   .catch((err) => {
+//     console.log("DB Connection errror", err);
+//   });
+listenToServer();
 function listenToServer() {
   app.listen(port, () => {
     console.log(`Server Listening on ${port} port`);
