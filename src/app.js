@@ -15,9 +15,9 @@ const port = 3001;
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/", (req, res) => {
-  res.send("Hello from Express");
-});
+// app.use("/", (req, res) => {
+//   res.send("Hello from Express");
+// });
 // To Do : Offload User realated functions to USER_SCHEMA
 
 //signup Api
