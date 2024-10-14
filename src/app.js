@@ -15,10 +15,12 @@ const port = 3001;
 app.use(express.json());
 app.use(cookieParser());
 
-// app.use("/", (req, res) => {
-//   res.send("Hello from Express");
-// });
 // To Do : Offload User realated functions to USER_SCHEMA
+/*
+after Render deployment testing 
+   1. Connect the DB 
+   2. remove the feed api testing
+*/
 
 //signup Api
 app.post("/signup", async (req, res) => {
@@ -93,6 +95,10 @@ app.get("/user", authValidation, async (req, res) => {
 //Feed Api (GET APi)
 app.get("/feed", authValidation, async (req, res) => {
   try {
+    res.status(200).send({
+      data1: "Divya ",
+      data2: "Divya ",
+    });
     console.log("Going for the Authentication");
     console.log("Auth Done");
     const userObj = await User.find({});
