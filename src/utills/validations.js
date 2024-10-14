@@ -1,6 +1,6 @@
 const validator = require("validator");
 
-const validateSignupData = (req) => {
+const validateSignupData = (req, res, next) => {
   const { firstName, lastName, emailId, password } = req.body;
 
   // firstname validation
@@ -10,14 +10,16 @@ const validateSignupData = (req) => {
   //emailId validation
 
   //password validation
+  next();
 };
 
-const validateLoginData = (req) => {
+const validateLoginData = (req, res, next) => {
   try {
     const { emailId } = req.body;
     if (!validateEmail(emailId)) {
       throw new Error("Invalid Email id");
     }
+    next();
   } catch (error) {
     throw new Error("error");
   }
