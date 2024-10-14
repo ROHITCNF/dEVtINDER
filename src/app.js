@@ -93,7 +93,7 @@ app.get("/user", authValidation, async (req, res) => {
 });
 
 //Feed Api (GET APi)
-app.get("/feed", authValidation, async (req, res) => {
+app.get("/feed", async (req, res) => {
   try {
     res.status(200).send({
       data1: "Divya ",
