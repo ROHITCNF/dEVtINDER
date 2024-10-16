@@ -17,8 +17,6 @@ const authValidation = async (req, res, next) => {
     const { token } = req.cookies;
     const decodedMessage = await jwt.verify(token, "rohit@cnf12345");
     const { _id } = decodedMessage;
-    console.log("Logging The id", _id);
-
     const userObj = await User.findOne({ _id: _id });
     if (!userObj) {
       throw new Error("User Not Authenticated ");

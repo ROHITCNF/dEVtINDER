@@ -33,5 +33,11 @@
 - Craete a JWT token use it as a cookie 
 - Use this token to authenticate as a middileware
 
+- Database indexing
+- When we shuld use ?
+- Pros , cons
+- DB querry , compound indexs
+
+
 
 

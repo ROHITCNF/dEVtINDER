@@ -11,6 +11,8 @@ const {
   validateLoginData,
 } = require("../utills/validations");
 
+const { authValidation } = require("../middlewares/auth");
+
 app.post("/signup", validateSignupData, async (req, res) => {
   //Validaion of data is mandatory
   try {
@@ -57,6 +59,12 @@ app.post("/login", validateLoginData, async (req, res) => {
     console.log(error);
     res.send("Some error occured" + error);
   }
+});
+
+app.post("/logout", authValidation, async (req, res) => {
+  // Method 1 :- setThe max age to 0 in the token cookie
+  res.cookie("token", "", { expires: new Date(date.now()) });
+  res.send("User LoggedOut Successfully");
 });
 
 module.exports = authRouter;

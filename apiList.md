@@ -7,7 +7,8 @@ AUTH_ROUTER
 
 Profile_Router
    - ViewProfile
-   - EditProfile
+   - EditProfile including passwords
+   - forgot password
 
 ConnectionRequest_Router
  - Intrested
