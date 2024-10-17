@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const Connection = require('../models/connectionRequest')
 const User = require('../models/user')
 const { sendResponseJson } = require('../constants/response')
@@ -23,8 +24,9 @@ const isValidUser = async (req, res, next) => {
     const userId = req.params.toUserId
     await User.exists({ _id: userId })
 
-    if (parseInt(userId) === parseInt(req?.user._id)) {
-      return sendResponseJson(res, 400, `Can't send request to youself`)
+    if (userId.toString() === req.user._id.toString()) {
+      console.log('Inside string function')
+      return sendResponseJson(res, 400, `Can't send request to yourself`)
     }
     next()
   } catch (error) {

@@ -1,8 +1,9 @@
-const sendResponseJson = (responsePointer, status, message) => {
-  const stat = status === 200 ? "ok" : "error";
+const sendResponseJson = (responsePointer, status, message, data = []) => {
+  const stat = status === 200 ? 'ok' : 'error'
   responsePointer.status(status).json({
     status: stat,
     message: message,
-  });
-};
-module.exports = { sendResponseJson };
+    data: data
+  })
+}
+module.exports = { sendResponseJson }

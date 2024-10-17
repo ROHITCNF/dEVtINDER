@@ -5,7 +5,7 @@ const Connection = require('../models/connectionRequest')
 const { fromToRequestExists, isValidUser } = require('../utills/requestHelpers')
 const { sendResponseJson } = require('../constants/response')
 
-// Send connectio  request
+// Send connection  request
 requestRouter.post(
   '/request/send/:toUserId/:status',
   authValidation,
@@ -14,9 +14,10 @@ requestRouter.post(
     try {
       /*
         Api level validations : 
-        1. check if incoming userId exists or not
+        1. check if incoming userId exists or not [Done]
         2. This Api should only do intrest and ignore [Done]
         3. If already the same status coming then don't perform DB operations [Done]
+        4. if from and send is same then directly rejects [done]
       */
 
       const fromUser = req.user
@@ -85,6 +86,24 @@ requestRouter.post(
         message: `${error}`
       })
     }
+  }
+)
+
+// Get the List of Your approval Api
+
+// Approve or reject Api
+requestRouter.post(
+  '/request/review/:toUserId/:status',
+  authValidation,
+  isValidUser,
+  async (req, res) => {
+    /*
+       Api level validations :  
+      1. Auth Validation .
+      2. Is [toUserId] is validUser
+      3. B is accepting / rejecting  A ,  means their is already request of A->B is present in DB.
+      4. incoming Status must be intrested then only u can accept or reject 
+    */
   }
 )
 

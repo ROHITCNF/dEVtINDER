@@ -1,78 +1,68 @@
 const express = require("express");
 const userRouter = express.Router();
-const app = userRouter;
 const User = require("../models/user");
 const { authValidation } = require("../middlewares/auth");
+const Connection = require("../models/connectionRequest");
+const { sendResponseJson } = require("../constants/response");
 
-app.get("/user", authValidation, async (req, res) => {
-  try {
-    const email = req?.body?.emailId;
-    const userObj = await User.findOne({ emailId: email });
-    if (userObj) {
-      res.send(userObj);
-    } else {
-      res.send("User Not found");
-    }
-  } catch (error) {
-    console.log(error);
-    res.send("Some error occured" + error);
-  }
+//Pending request Api
+userRouter.get("/user/requests/recieved", authValidation, async (req, res) => {
+  const loggedInUser = req?.user;
+  const connectionRequests = await Connection.find({
+    toUserId: loggedInUser._id,
+    status: "intrested",
+  }).populate("fromUserId", ["firstName", "lastName", "photoUrl"]);
 });
 
-//Feed Api (GET APi)
-app.get("/feed", authValidation, async (req, res) => {
-  try {
-    console.log("Going for the Authentication");
-    console.log("Auth Done");
-    const userObj = await User.find({});
-    if (userObj.length) {
-      res.send(userObj);
-    } else {
-      res.send("No user found");
-    }
-  } catch (error) {
-    console.log(error);
-    res.send(`Some error occured : ${error}`);
-  }
+//All the connections of a particular user To do
+userRouter.get("/user/connections", authValidation, async (req, res) => {
+  // All the connection of user a
+  // A can be is fromUserID || toUserId
+  // And the status must be accepted
 });
 
-// Delete a user
-app.delete("/user", async (req, res) => {
+userRouter.get("/user/feed", authValidation, async (req, res) => {
   try {
-    const userId = req?.body?.userId;
-    const user = await User.findByIdAndDelete(userId);
-    user && res.send("User deleted Sucessfully");
-    !user && res.send("Couldn't find the user");
-  } catch (error) {
-    res.send("Some error occured" + error);
-  }
-});
+    const loggedInUser = req?.user;
+    /*
+     Users should not see :-
+     1. His own card.
+     2. to all the users 
+        -> user has sent request (i.e A->B or b->A)
+        -> Connected Users
+        -> user has ignored someone
+        -> someone has ignored user
+   */
+    const connectionRequests = await Connection.find({
+      $or: [
+        { fromUserId: loggedInUser._id.toString() },
+        {
+          fromUserId: loggedInUser._id.toString(),
+        },
+      ],
+    }).select("fromUserId toUserId");
 
-//update the user
-app.patch("/user/:userId", async (req, res) => {
-  try {
-    const userId = req?.params.userId;
-    const data = req?.body;
-
-    const allowedUpdates = ["photoUrl", "about", "skills"];
-    const updatedDataObject = Object.keys(data).every((key) => {
-      return allowedUpdates.includes(key);
+    // Now we got the multiple connections now  add all from and to in a set and make listof unique sets
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+    // Now we have list of id_s which should not be shown
+    //Now loop over the User colloection and finall all the ID
+    const usersToShow = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
     });
 
-    // updatedDataObject :- false then return  as a response
-    if (!updatedDataObject) {
-      res.send("Update Not allowed");
-      return;
-    }
-
-    const updatedData = await User.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    updatedData && res.send(`User data Updated Sucessfully : ${updatedData}`);
+    sendResponseJson(res, 200, "Got the data", usersToShow);
   } catch (error) {
     console.log(error);
-    res.send(`Some error occured : ${error}`);
+
+    sendResponseJson(res, 400, error);
   }
 });
+
 module.exports = userRouter;

@@ -39,5 +39,8 @@
 - DB querry , compound indexs
 
 
+- Refernce and poulate concept in DB [b/w two tables]
+- How to use refs and populate in Mongoose / MongoDb
 
+- QUERRY OPerators
 
