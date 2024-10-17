@@ -22,8 +22,13 @@ userRouter.get("/user/connections", authValidation, async (req, res) => {
 });
 
 userRouter.get("/user/feed", authValidation, async (req, res) => {
+  // Pagination is their But sanitize it
   try {
     const loggedInUser = req?.user;
+    const page = parseInt(req?.query.page);
+    let limit = parseInt(req?.query.limit);
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
     /*
      Users should not see :-
      1. His own card.
@@ -50,12 +55,17 @@ userRouter.get("/user/feed", authValidation, async (req, res) => {
     });
     // Now we have list of id_s which should not be shown
     //Now loop over the User colloection and finall all the ID
+    console.log("Skip", skip);
+    console.log("limit", limit);
+
     const usersToShow = await User.find({
       $and: [
         { _id: { $nin: Array.from(hideUsersFromFeed) } },
         { _id: { $ne: loggedInUser._id } },
       ],
-    });
+    })
+      .skip(skip)
+      .limit(limit);
 
     sendResponseJson(res, 200, "Got the data", usersToShow);
   } catch (error) {
