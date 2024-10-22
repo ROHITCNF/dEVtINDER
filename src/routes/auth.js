@@ -12,6 +12,7 @@ const {
 } = require("../utills/validations");
 
 const { authValidation } = require("../middlewares/auth");
+const { sendResponseJson } = require("../constants/response");
 
 app.post("/signup", validateSignupData, async (req, res) => {
   //Validaion of data is mandatory
@@ -42,22 +43,23 @@ app.post("/signup", validateSignupData, async (req, res) => {
 app.post("/login", validateLoginData, async (req, res) => {
   try {
     const { emailId, password } = req.body;
+
     // get the hashed password from the DB and Decrypt it
     const userObj = await User.findOne({ emailId: emailId });
     if (!userObj) {
-      throw new Error("Incorrect Credentials");
+      sendResponseJson(res, 400, "Invalid credentials");
     }
     const isCorrectPassword = await userObj.validateUserPassword(password);
     if (isCorrectPassword) {
       const token = await userObj.getJWT(); // More modular code
       res.cookie("token", token);
-      res.send("Login Successfull");
+      sendResponseJson(res, 200, "logged In Successfully", userObj);
     } else {
-      res.send("Incorrect Credentials");
+      sendResponseJson(res, 400, "Invalid credentials");
     }
   } catch (error) {
     console.log(error);
-    res.send("Some error occured" + error);
+    sendResponseJson(res, 400, error);
   }
 });
 

@@ -1,4 +1,5 @@
 const validator = require("validator");
+const { sendResponseJson } = require("../constants/response");
 const validateSignupData = (req, res, next) => {
   const { firstName, lastName, emailId, password } = req.body;
 
@@ -15,12 +16,15 @@ const validateSignupData = (req, res, next) => {
 const validateLoginData = (req, res, next) => {
   try {
     const { emailId } = req.body;
+    console.log(emailId);
+
     if (!validateEmail(emailId)) {
-      throw new Error("Invalid Email id");
+      sendResponseJson(res, 400, "Invalid credentials");
     }
     next();
   } catch (error) {
-    throw new Error("error");
+    console.log("Inside Validate login Catch block");
+    sendResponseJson(res, 400, "Invalid credentials");
   }
 };
 

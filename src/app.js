@@ -2,11 +2,17 @@ const express = require("express");
 const app = express();
 const { connectToDb } = require("./config/database");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const port = 7777;
 
+const corsOptions = {
+  origin: "http://localhost:5174",
+  credentials: true,
+};
 //middileWare for express json
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors(corsOptions));
 
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
