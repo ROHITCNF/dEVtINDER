@@ -1,14 +1,15 @@
 const express = require("express");
 const profileRouter = express.Router();
 const { authValidation } = require("../middlewares/auth");
+const { sendResponseJson } = require("../constants/response");
 
 profileRouter.get("/profile/view", authValidation, async (req, res) => {
   try {
     const user = req?.user;
-    res.send(user);
+    sendResponseJson(res, 200, "UserProfile Get Successfully", user);
   } catch (error) {
     console.log(error);
-    res.status(400).send("Error Occured : " + error);
+    sendResponseJson(res, 400, "Error Occured : " + error);
   }
 });
 

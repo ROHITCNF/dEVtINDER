@@ -14,6 +14,15 @@ const {
 const { authValidation } = require("../middlewares/auth");
 const { sendResponseJson } = require("../constants/response");
 
+authRouter.get("/gatekeeperAuth", authValidation, async (req, res) => {
+  try {
+    sendResponseJson(res, 200, "User Verfied Successfully");
+  } catch (error) {
+    console.log(error);
+    sendResponseJson(res, 401, error);
+  }
+});
+
 app.post("/signup", validateSignupData, async (req, res) => {
   //Validaion of data is mandatory
   try {
@@ -21,7 +30,6 @@ app.post("/signup", validateSignupData, async (req, res) => {
     // Encrypt the password
     const { password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(`hashedPassword : ${hashedPassword}`);
 
     // Create a new instance of  userModel with above data
     const user = new User({
@@ -30,6 +38,7 @@ app.post("/signup", validateSignupData, async (req, res) => {
       emailId: payloadData?.emailId,
       password: hashedPassword,
       gender: payloadData?.gender,
+      age: payloadData?.age,
     });
     console.log("created new instance of User Model");
     await user.save();
@@ -47,26 +56,25 @@ app.post("/login", validateLoginData, async (req, res) => {
     // get the hashed password from the DB and Decrypt it
     const userObj = await User.findOne({ emailId: emailId });
     if (!userObj) {
-      sendResponseJson(res, 400, "Invalid credentials");
+      return sendResponseJson(res, 400, "Invalid credentials");
     }
     const isCorrectPassword = await userObj.validateUserPassword(password);
     if (isCorrectPassword) {
       const token = await userObj.getJWT(); // More modular code
       res.cookie("token", token);
-      sendResponseJson(res, 200, "logged In Successfully", userObj);
+      return sendResponseJson(res, 200, "logged In Successfully", userObj);
     } else {
-      sendResponseJson(res, 400, "Invalid credentials");
+      return sendResponseJson(res, 400, "Invalid credentials");
     }
   } catch (error) {
     console.log(error);
-    sendResponseJson(res, 400, error);
+    return sendResponseJson(res, 400, error);
   }
 });
 
-app.post("/logout", authValidation, async (req, res) => {
-  // Method 1 :- setThe max age to 0 in the token cookie
-  res.cookie("token", "", { expires: new Date(date.now()) });
-  res.send("User LoggedOut Successfully");
+app.post("/logout", async (req, res) => {
+  res.cookie("token", "", { maxAge: 0 });
+  sendResponseJson(res, 200, "User LoggedOut Successfully");
 });
 
 module.exports = authRouter;

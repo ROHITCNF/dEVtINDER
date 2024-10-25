@@ -16,15 +16,13 @@ const validateSignupData = (req, res, next) => {
 const validateLoginData = (req, res, next) => {
   try {
     const { emailId } = req.body;
-    console.log(emailId);
-
     if (!validateEmail(emailId)) {
-      sendResponseJson(res, 400, "Invalid credentials");
+      return sendResponseJson(res, 400, "Invalid credentials");
     }
     next();
   } catch (error) {
     console.log("Inside Validate login Catch block");
-    sendResponseJson(res, 400, "Invalid credentials");
+    return sendResponseJson(res, 400, "Invalid credentials");
   }
 };
 

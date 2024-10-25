@@ -6,7 +6,7 @@ const cors = require("cors");
 const port = 7777;
 
 const corsOptions = {
-  origin: "http://localhost:5174",
+  origin: "http://localhost:5173",
   credentials: true,
 };
 //middileWare for express json
