@@ -16,9 +16,52 @@ userRouter.get("/user/requests/recieved", authValidation, async (req, res) => {
 
 //All the connections of a particular user To do
 userRouter.get("/user/connections", authValidation, async (req, res) => {
-  // All the connection of user a
-  // A can be is fromUserID || toUserId
-  // And the status must be accepted
+  try {
+    // All the connection of user a
+    // A can be is fromUserID || toUserId
+    // And the status must be accepted
+
+    const loggedInUser = req?.user;
+    const connectionRequests = await Connection.find({
+      $and: [
+        {
+          $or: [
+            { fromUserId: loggedInUser._id.toString() },
+            {
+              toUserId: loggedInUser._id.toString(),
+            },
+          ],
+        },
+        {
+          status: "accepted",
+        },
+      ],
+    });
+    // Now we got the multiple connections now  add all from and to in a set and make listof unique sets
+    const uniqueConnectionsOfUser = new Set();
+    connectionRequests.forEach((req) => {
+      uniqueConnectionsOfUser.add(req.fromUserId.toString());
+      uniqueConnectionsOfUser.add(req.toUserId.toString());
+    });
+
+    // Now we have list of unique Ids + user itself
+    // so send the response off all the users which is present in the Set - user itself
+    const userConnectionsToShow = await User.find({
+      $and: [
+        { _id: { $in: Array.from(uniqueConnectionsOfUser) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    });
+    sendResponseJson(
+      res,
+      200,
+      "Succesfull Got the User Connections",
+      userConnectionsToShow
+    );
+  } catch (error) {
+    console.log(error);
+    sendResponseJson(res, 400, error);
+  }
 });
 
 userRouter.get("/user/feed", authValidation, async (req, res) => {
@@ -42,7 +85,7 @@ userRouter.get("/user/feed", authValidation, async (req, res) => {
       $or: [
         { fromUserId: loggedInUser._id.toString() },
         {
-          fromUserId: loggedInUser._id.toString(),
+          toUserId: loggedInUser._id.toString(),
         },
       ],
     }).select("fromUserId toUserId");
@@ -55,9 +98,6 @@ userRouter.get("/user/feed", authValidation, async (req, res) => {
     });
     // Now we have list of id_s which should not be shown
     //Now loop over the User colloection and finall all the ID
-    console.log("Skip", skip);
-    console.log("limit", limit);
-
     const usersToShow = await User.find({
       $and: [
         { _id: { $nin: Array.from(hideUsersFromFeed) } },

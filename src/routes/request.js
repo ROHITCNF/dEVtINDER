@@ -1,13 +1,16 @@
-const express = require('express')
-const requestRouter = express.Router()
-const { authValidation } = require('../middlewares/auth')
-const Connection = require('../models/connectionRequest')
-const { fromToRequestExists, isValidUser } = require('../utills/requestHelpers')
-const { sendResponseJson } = require('../constants/response')
+const express = require("express");
+const requestRouter = express.Router();
+const { authValidation } = require("../middlewares/auth");
+const Connection = require("../models/connectionRequest");
+const {
+  fromToRequestExists,
+  isValidUser,
+} = require("../utills/requestHelpers");
+const { sendResponseJson } = require("../constants/response");
 
 // Send connection  request
 requestRouter.post(
-  '/request/send/:toUserId/:status',
+  "/request/send/:toUserId/:status",
   authValidation,
   isValidUser,
   async (req, res) => {
@@ -20,42 +23,42 @@ requestRouter.post(
         4. if from and send is same then directly rejects [done]
       */
 
-      const fromUser = req.user
-      const toUserId = req.params.toUserId
-      const incomingStatus = req.params.status
-      const allowedStatus = ['ignored', 'intrested']
+      const fromUser = req.user;
+      const toUserId = req.params.toUserId;
+      const incomingStatus = req.params.status;
+      const allowedStatus = ["ignored", "intrested"];
       if (!allowedStatus.includes(incomingStatus)) {
-        return sendResponseJson(res, 400, 'Invalid Request Found')
+        return sendResponseJson(res, 400, "Invalid Request Found");
       }
 
       // If their is already existing connection request  A->B or B->A :
       const fromToRequestExist = await fromToRequestExists(
         fromUser._id,
         toUserId
-      )
+      );
       if (fromToRequestExist) {
         if (fromToRequestExist?.status === incomingStatus) {
           return sendResponseJson(
             res,
             400,
             `${incomingStatus} Request is already their`
-          )
+          );
         } else {
           //update the existing request
           const updatedData = await Connection.findOneAndUpdate(
             {
               fromUserId: fromToRequestExist.fromUserId,
-              toUserId: fromToRequestExist.toUserId
+              toUserId: fromToRequestExist.toUserId,
             },
             { status: incomingStatus }
-          )
+          );
 
           if (Object.keys(updatedData).length) {
             return sendResponseJson(
               res,
               200,
               `Updated the staus to ${incomingStatus}`
-            )
+            );
           }
         }
       }
@@ -63,37 +66,39 @@ requestRouter.post(
       const toFromRequestExist = await fromToRequestExists(
         toUserId,
         fromUser._id
-      )
+      );
       if (toFromRequestExist) {
-        return res.status(400).json({
-          status: 'error',
-          message: `Other Person has already sent u the request`
-        })
+        return sendResponseJson(
+          res,
+          400,
+          "Other Person has already sent u the request"
+        );
       }
       const connection = new Connection({
         fromUserId: fromUser._id,
         toUserId: toUserId,
-        status: incomingStatus
-      })
-      await connection.save()
-      res.json({
-        status: 'ok',
-        message: `Successfully saved the ${incomingStatus} request`
-      })
+        status: incomingStatus,
+      });
+      await connection.save();
+      return sendResponseJson(
+        res,
+        200,
+        `Successfully saved the ${incomingStatus} request`
+      );
     } catch (error) {
       res.status(400).json({
-        status: 'error',
-        message: `${error}`
-      })
+        status: "error",
+        message: `${error}`,
+      });
     }
   }
-)
+);
 
 // Get the List of Your approval Api
 
 // Approve or reject Api
 requestRouter.post(
-  '/request/review/:toUserId/:status',
+  "/request/review/:toUserId/:status",
   authValidation,
   isValidUser,
   async (req, res) => {
@@ -105,6 +110,6 @@ requestRouter.post(
       4. incoming Status must be intrested then only u can accept or reject 
     */
   }
-)
+);
 
-module.exports = requestRouter
+module.exports = requestRouter;

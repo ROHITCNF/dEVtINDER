@@ -15,6 +15,8 @@ profileRouter.get("/profile/view", authValidation, async (req, res) => {
 
 profileRouter.patch("/profile/edit", authValidation, async (req, res) => {
   // To do for the profile edit logic
+  const user = req?.user;
+  sendResponseJson(res, 200, "UserProfile Updated Successfully", user);
 });
 
 module.exports = profileRouter;
