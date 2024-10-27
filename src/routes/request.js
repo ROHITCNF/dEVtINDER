@@ -2,6 +2,7 @@ const express = require("express");
 const requestRouter = express.Router();
 const { authValidation } = require("../middlewares/auth");
 const Connection = require("../models/connectionRequest");
+const User = require("../models/user");
 const {
   fromToRequestExists,
   isValidUser,
@@ -102,13 +103,54 @@ requestRouter.post(
   authValidation,
   isValidUser,
   async (req, res) => {
-    /*
-       Api level validations :  
-      1. Auth Validation .
-      2. Is [toUserId] is validUser
-      3. B is accepting / rejecting  A ,  means their is already request of A->B is present in DB.
-      4. incoming Status must be intrested then only u can accept or reject 
-    */
+    try {
+      /*
+         Api level validations :  
+        0. only accepted or rejected should be allowed
+        1. Auth Validation .
+        2. Is [toUserId] is validUser
+        3. B is accepting / rejecting  A ,  means their is already request of A->B is present in DB.
+        4. incoming Status must be intrested then only u can accept or reject 
+      */
+      const fromUser = req.user; // this id will accept or reject the request
+      const toUserId = req.params.toUserId;
+      const incomingStatus = req.params.status;
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(incomingStatus)) {
+        return sendResponseJson(res, 400, "Invalid Request Found");
+      }
+      await User.exists({ _id: toUserId });
+      const requestIsAlreadyTheirFromBToA = await Connection.find({
+        $and: [
+          { fromUserId: toUserId },
+          { toUserId: fromUser._id },
+          { status: "intrested" },
+        ],
+      });
+      if (!requestIsAlreadyTheirFromBToA.length) {
+        sendResponseJson(res, 400, "B has not sent u connection request");
+      }
+
+      // Now update the requests
+      const updatedData = await Connection.findOneAndUpdate(
+        {
+          fromUserId: toUserId,
+          toUserId: fromUser._id,
+        },
+        { status: incomingStatus }
+      );
+
+      if (Object.keys(updatedData).length) {
+        return sendResponseJson(
+          res,
+          200,
+          `Successfully  ${incomingStatus} the request`
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      sendResponseJson(res, 400, error);
+    }
   }
 );
 

@@ -7,11 +7,22 @@ const { sendResponseJson } = require("../constants/response");
 
 //Pending request Api
 userRouter.get("/user/requests/recieved", authValidation, async (req, res) => {
-  const loggedInUser = req?.user;
-  const connectionRequests = await Connection.find({
-    toUserId: loggedInUser._id,
-    status: "intrested",
-  }).populate("fromUserId", ["firstName", "lastName", "photoUrl"]);
+  try {
+    const loggedInUser = req?.user;
+    const connectionRequests = await Connection.find({
+      toUserId: loggedInUser._id,
+      status: "intrested",
+    }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "_id"]);
+    sendResponseJson(
+      res,
+      200,
+      "Succesfull Got the resquests sent to user",
+      connectionRequests
+    );
+  } catch (error) {
+    console.log(error);
+    sendResponseJson(res, 400, error);
+  }
 });
 
 //All the connections of a particular user To do

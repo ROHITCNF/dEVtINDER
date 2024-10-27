@@ -40,12 +40,11 @@ app.post("/signup", validateSignupData, async (req, res) => {
       gender: payloadData?.gender,
       age: payloadData?.age,
     });
-    console.log("created new instance of User Model");
     await user.save();
-    console.log("Saved the data in the DB");
-    res.send("Successfully saved the data in teh DB");
+    sendResponseJson(res, 200, "Successfully saved the data in teh DB");
   } catch (error) {
-    res.send(`Some error occured : ${error}`);
+    console.log(error);
+    sendResponseJson(res, 400, error);
   }
 });
 
