@@ -60,7 +60,13 @@ app.post("/login", validateLoginData, async (req, res) => {
     const isCorrectPassword = await userObj.validateUserPassword(password);
     if (isCorrectPassword) {
       const token = await userObj.getJWT(); // More modular code
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,   // Required for "none"
+        sameSite: "none"
+      });
+      
+      
       return sendResponseJson(res, 200, "logged In Successfully", userObj);
     } else {
       return sendResponseJson(res, 400, "Invalid credentials");
