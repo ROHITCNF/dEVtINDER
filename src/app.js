@@ -3,7 +3,7 @@ const app = express();
 const { connectToDb } = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const port = 7777;
+const port =  process.env.PORT ||  7777;
 
 const corsOptions = {
   origin: "http://localhost:5173",
